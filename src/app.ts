@@ -21,7 +21,6 @@ import bookingRouter from './routes/booking'
 import authRouter from './routes/auth'
 import bookingClientRouter from './routes/bookingClient'
 import bookingClientFinalRouter from './routes/bookingClientFinal';
-import refundRouter from './routes/refund'
 import { jwtStrategy } from './config/passport';
 
 
@@ -72,8 +71,6 @@ app.use('/api/v1/booking-client', bookingClientRouter)
 //user auth needed
 app.use('/api/v1/booking-client-final', bookingClientFinalRouter)
 
-//refund
-app.use('/api/v1/refund', refundRouter)
 
 //auth
 app.use('/api/v1/auth', authRouter)
