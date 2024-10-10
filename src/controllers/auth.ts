@@ -67,7 +67,7 @@ export const signUp = async (
       Thank you for signing up! To complete your registration, please confirm your email address by clicking the link below:
     </p>
     <div style="text-align: center; margin: 20px 0;">
-      <a href="${clientURL}/auth/confirm/${emailConfirmationToken}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+      <a href="${process.env.CLIENT_URL}/auth/confirm/${emailConfirmationToken}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
         Confirm Email
       </a>
     </div>
