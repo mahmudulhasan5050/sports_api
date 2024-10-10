@@ -24,6 +24,9 @@ import bookingClientFinalRouter from './routes/bookingClientFinal';
 import refundRouter from './routes/refund'
 import { jwtStrategy } from './config/passport';
 
+
+
+
 //Database connection
 mongoose
   .connect(MongoUri)
@@ -34,11 +37,14 @@ mongoose
     console.log('Mongo Error' + err);
   });
 
-
+  var corsOptions = {
+    origin: ['http://localhost:3000', '*'],
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
 
 // Create an Express application
 const app: Application = express();
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors(corsOptions));
 app.use(express.json({limit: '100mb'}))
 app.use(express.urlencoded({extended: true}))
 
@@ -49,9 +55,11 @@ passport.use(jwtStrategy)
 
 //all routes list
 //user
+
 app.use('/api/v1/user', userRouter)
 //facility
 app.use('/api/v1/facilityunit', facilityUnitRouter)
+app.use('/api/v1/facilityunit1', facilityUnitRouter)
 // faciliy details
 app.use('/api/v1/facility', facilityRouter)
 //opening hour 

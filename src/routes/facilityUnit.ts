@@ -14,6 +14,7 @@ const router = express.Router();
 //get all
 router.get('/', allFacilityUnit);
 
+
 //create facilityUnit
 router.post(
   '/',
