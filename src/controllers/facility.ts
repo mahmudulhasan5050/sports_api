@@ -5,8 +5,7 @@ import Facility from '../models/Facility';
 import {
   AlreadyExistError,
   BadRequestError,
-  ForbiddenError,
-  NotFoundError,
+  ForbiddenError
 } from '../apiErrors/apiErrors';
 
 //get all facilities

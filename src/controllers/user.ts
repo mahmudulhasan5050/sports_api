@@ -1,12 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import userServices from '../services/user';
 
-import User from '../models/User';
 import {
-  AlreadyExistError,
   BadRequestError,
   ForbiddenError,
-  NotFoundError,
 } from '../apiErrors/apiErrors';
 
 //get all facilities

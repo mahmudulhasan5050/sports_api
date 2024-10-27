@@ -12,9 +12,7 @@ import {
   UnauthorizedError,
 } from '../apiErrors/apiErrors';
 import {
-  hashPassword,
   generateEmailConfirmationToken,
-  comparePassword,
   genPassword,
   validPassword,
 } from '../utils/crypto';
