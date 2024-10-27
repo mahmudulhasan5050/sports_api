@@ -4,7 +4,7 @@ import GoogleStrategy from 'passport-google-oauth20';
 
 import authServices from '../services/auth';
 
-import { apiURL, secretAuth } from '../utils/secrets';
+import { apiURL, googleClientId, googleClientSecret, secretAuth } from '../utils/secrets';
 
 import User, { IUser } from '../models/User';
 
@@ -38,9 +38,8 @@ export const jwtStrategy = new JwtStrategy.Strategy(
 
 export const googleStrategy = new GoogleStrategy.Strategy(
   {
-    clientID:
-      '1087861861596-vtstrr7nbu7ut3s1l5k9kpclgiq16gov.apps.googleusercontent.com',
-    clientSecret: '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',
+    clientID: googleClientId,
+    clientSecret: googleClientSecret,
     callbackURL: `${apiURL}/api/v1/auth/google/redirect`,
   },
   async (accessToken, refreshToken, profile, done) => {
