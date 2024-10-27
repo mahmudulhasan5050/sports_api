@@ -3,8 +3,9 @@ import mongoose, { Document } from 'mongoose';
 export interface IUser extends Document {
   name: string;
   email: string;
-  salt: string;
-  hash: string;
+  salt?: string;
+  hash?: string;
+  googleId?: string;
   role: 'admin' | 'member' | 'non-member';
   isPaid: boolean;
   isValid: boolean;
@@ -16,9 +17,15 @@ export interface IUser extends Document {
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  salt: {type: String, required: true},
-  hash: {type: String, required: true},
-  role: { type: String, enum: ['admin', 'member', 'non-member'], required: true, default: 'non-member' },
+  salt: { type: String },
+  hash: { type: String },
+  googleId: { type: String },
+  role: {
+    type: String,
+    enum: ['admin', 'member', 'non-member'],
+    required: true,
+    default: 'non-member',
+  },
   isPaid: { type: Boolean, default: false },
   isValid: { type: Boolean, required: true, default: false },
   emailConfirmationToken: { type: String },
@@ -28,4 +35,3 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model<IUser>('User', userSchema);
 export default User;
-

@@ -55,13 +55,12 @@ export const issueJWT =(user:IUser)=> {
 
   const payload = {
     sub: _id,
+    name:user.name,
+    role: user.role,
     iat: Date.now()
   };
 
   const signedToken = jwt.sign(payload, secretAuth, { expiresIn: expiresIn });
 
-  return {
-    token: "Bearer " + signedToken,
-    expires: expiresIn
-  }
+  return "Bearer " + signedToken
 }

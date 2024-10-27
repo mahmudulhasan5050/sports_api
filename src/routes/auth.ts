@@ -5,9 +5,11 @@ import {
     confirmEmail,
     signIn,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    googleRedirect
   
 } from '../controllers/auth';
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -19,6 +21,11 @@ router.post('/signin', signIn);
 
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
+
+//google
+router.get('/google', passport.authenticate('google', {scope: ['profile', 'email']}))
+
+router.get('/google/redirect', passport.authenticate('google', {session: false}), googleRedirect)
 
   
 

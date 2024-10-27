@@ -6,6 +6,7 @@ import User, { IUser } from '../models/User';
 import authServices from '../services/auth';
 import {
   AlreadyExistError,
+  BadRequestError,
   DoesNotExist,
   NotFoundError,
   UnauthorizedError,
@@ -149,13 +150,8 @@ export const signIn = async (
       }
 
       const token = await authServices.signIn(user);
-
-      res.status(200).json({
-        role: token.role,
-        name: token.name,
-        token: token.token,
-        expiresIn: token.expiresIn,
-      });
+      console.log(typeof token + '--', token);
+      res.status(200).json(token);
     } else {
       res.status(401).json('Unauthorized Error');
     }
@@ -250,5 +246,27 @@ export const resetPassword = async (
     }
   } catch (error) {
     res.status(500).json({ message: 'Error resetting password' });
+  }
+};
+
+export const googleRedirect = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user as IUser;
+
+  if (user) {
+    try {
+      const token = await authServices.signIn(user);
+      console.log('gggggg::::::: ', token);
+      //redirect
+      const encodedToken = encodeURIComponent(token);
+      res.redirect(`${clientURL}/google-auth-success/${encodedToken}`);
+    } catch (error) {
+      next(new BadRequestError());
+    }
+  } else {
+    next(new UnauthorizedError());
   }
 };

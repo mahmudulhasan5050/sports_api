@@ -21,12 +21,8 @@ const confirmEmail = async (user: IUser) => {
 const signIn = async (user: IUser) => {
   const token = issueJWT(user);
 
-  return {
-    name: user.name,
-    role: user.role,
-    token: token.token,
-    expiresIn: token.expires,
-  };
+  return token
+
 };
 
 
@@ -40,11 +36,15 @@ const resetPassword = async(user:IUser)=>{
   return saveUser
 }
 
+const googleRegister = async(user:IUser)=>{
+return await user.save()
+}
+
 export default {
   signUp,
   confirmEmail,
   signIn,
   forgotPassword,
-  resetPassword
-
+  resetPassword,
+  googleRegister
 };

@@ -21,7 +21,7 @@ import bookingRouter from './routes/booking'
 import authRouter from './routes/auth'
 import bookingClientRouter from './routes/bookingClient'
 import bookingClientFinalRouter from './routes/bookingClientFinal';
-import { jwtStrategy } from './config/passport';
+import { googleStrategy, jwtStrategy } from './config/passport';
 
 
 
@@ -38,7 +38,7 @@ mongoose
 
   var corsOptions = {
     origin: '*',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200 
   }
 
 // Create an Express application
@@ -50,6 +50,7 @@ app.use(express.urlencoded({extended: true}))
 
 app.use(passport.initialize())
 passport.use(jwtStrategy)
+passport.use(googleStrategy)
 
 
 //all routes list
