@@ -1,4 +1,6 @@
 import mongoose, { Document } from 'mongoose';
+import { IUser } from './User';
+import { IFacility } from './Facility';
 
 
 export interface IBooking extends Document {

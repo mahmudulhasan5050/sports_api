@@ -1,18 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import bookingServices from '../services/bookingClientFinal';
+import nodemailer from 'nodemailer';
 
 import Booking from '../models/Booking';
 import {
   AlreadyExistError,
   BadRequestError,
   ForbiddenError,
-  NotFoundError
+  NotFoundError,
 } from '../apiErrors/apiErrors';
 import Facility from '../models/Facility';
-import {addMinutes} from '../utils/timeSlotHelper'
+import { addMinutes } from '../utils/timeSlotHelper';
 import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
-
+import {
+  sendBookingConfirmationEmail,
+} from '../utils/allEmailsNodeMailer';
 
 //create booking
 export const createBooking = async (
@@ -35,22 +38,22 @@ export const createBooking = async (
   try {
     //check facilityId exist'
     const facilityExist = await Facility.findById(facilityId);
-    if(!facilityExist) throw new NotFoundError()
-    const userExist = await User.findById(user._id)
-    if(!userExist) throw new NotFoundError()
+    if (!facilityExist) throw new NotFoundError();
+    const userExist = await User.findById(user._id);
+    if (!userExist) throw new NotFoundError();
 
     // check existance
     const isExist = await Booking.findOne({
       facility: facilityId,
       date: date,
       startTime: time,
-      isCancelled: false
+      isCancelled: false,
     });
     if (isExist) throw new AlreadyExistError();
 
     //create new facility according to user input
-    const endTime = addMinutes(time,duration)
-    
+    const endTime = addMinutes(time, duration);
+
     const newBooking = new Booking({
       user: userExist._id,
       facility: facilityId,
@@ -59,18 +62,25 @@ export const createBooking = async (
       endTime: endTime,
       duration: duration,
       paymentAmount,
-      isPaid
+      isPaid,
     });
 
     // call service function to save in database¨
     const createSuccess = await bookingServices.createBooking(newBooking);
+    //------------------start from here-----------------------------------------
+    if (createSuccess) {
+      const pupulatedOtherData = await createSuccess.populate([
+        { path: 'user' },
+        { path: 'facility' },
+      ]);
+      //Need to apply email is sent or not
+      await sendBookingConfirmationEmail(pupulatedOtherData);
+    }
     res.status(200).json(createSuccess);
   } catch (error) {
     next(new BadRequestError('Can not create booking', error));
   }
 };
-
-
 
 export const deleteBooking = async (
   req: Request,
@@ -87,5 +97,3 @@ export const deleteBooking = async (
     next(new BadRequestError('Can not delete.....', error));
   }
 };
-
-

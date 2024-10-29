@@ -48,7 +48,13 @@ export const googleStrategy = new GoogleStrategy.Strategy(
       if (email) {
         const user = await User.findOne({ email });
         if (user) {
-          return done(null, user);
+          if(user.googleId){
+            return done(null, user);
+          }else{
+            const error = new Error("Please use email/password to sign in.");
+            (error as any).customMessage = "User exists but sign-in method is email/password.";
+            return done(error, false);
+          }
         } else {
           const newUser = new User({
             name: profile.displayName,

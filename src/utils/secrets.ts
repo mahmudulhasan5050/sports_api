@@ -11,3 +11,6 @@ export const secretAuth = process.env['SECRET'] as string;
 export const googleClientId = process.env['GOOGLE_CLIENT_ID'] as string
 export const googleClientSecret = process.env['GOOGLE_CLIENT_SECRET'] as string
 export const googleCallbackRedirect = process.env['API_URL'] as string
+
+export const emailSender = process.env['EMAIL_USER'] as string
+export const emailPassForSender = process.env['EMAIL_PASS'] as string

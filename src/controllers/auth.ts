@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import nodemailer from 'nodemailer';
 
 import { clientURL } from '../utils/secrets';
 import User, { IUser } from '../models/User';
@@ -16,6 +15,11 @@ import {
   genPassword,
   validPassword,
 } from '../utils/crypto';
+import { transporter } from '../config/nodemailer';
+import {
+  sendRegistrationConfirmationEmail,
+  sendResetPasswordEmail,
+} from '../utils/allEmailsNodeMailer';
 
 // Register account-------------------------
 export const signUp = async (
@@ -45,44 +49,10 @@ export const signUp = async (
 
     const createSuccess = await authServices.signUp(newUser);
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      host: 'smtp.gmail.com',
-      port: 587,
-      auth: {
-        user: process.env.EMAIL_USER, // admin email
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: createSuccess.email,
-      subject: 'Email Confirmation',
-      html: ` <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
-    <h2 style="color: #333; text-align: center;">Welcome to Tennis Center</h2>
-    <p style="color: #555;">Hi ${createSuccess.name},</p>
-    <p style="color: #555;">
-      Thank you for signing up! To complete your registration, please confirm your email address by clicking the link below:
-    </p>
-    <div style="text-align: center; margin: 20px 0;">
-      <a href="${process.env.CLIENT_URL}/auth/confirm/${emailConfirmationToken}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-        Confirm Email
-      </a>
-    </div>
-    <p style="color: #555;">If the button above doesn't work, copy and paste the following link into your browser:</p>
-    <p style="color: #007BFF; word-break: break-all;">
-      <a href="${clientURL}/auth/confirm/${emailConfirmationToken}" style="color: #007BFF;">${clientURL}/auth/confirm/${emailConfirmationToken}</a>
-    </p>
-    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
-    <p style="color: #888; font-size: 12px; text-align: center;">
-      If you didn't create an account, please ignore this email.
-    </p>
-  </div>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
+    if (createSuccess) {
+      //sending email. Need to work to confirm user has recieved email
+      await sendRegistrationConfirmationEmail(createSuccess);
+    }
     res
       .status(201)
       .json({ message: 'User registered, please check your email to confirm' });
@@ -173,27 +143,10 @@ export const forgotPassword = async (
       user.passwordResetToken = resetToken;
       user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiration
       const userSuccess = await authServices.forgotPassword(user);
+
       if (userSuccess) {
-        // Send email with reset link
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          host: 'smtp.gmail.com',
-          port: 587,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const resetURL = `${clientURL}/reset-password/${resetToken}`;
-        const mailOptions = {
-          from: process.env.EMAIL_USER,
-          to: user.email,
-          subject: 'Password Reset',
-          html: `<p>You requested a password reset. Click this <a href="${resetURL}">link</a> to reset your password.</p>`,
-        };
-
-        await transporter.sendMail(mailOptions);
+        //sending email. Need to work to confirm user has recieved email
+        await sendResetPasswordEmail(userSuccess);
 
         res
           .status(200)
