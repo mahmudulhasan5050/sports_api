@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment-timezone';
 import { IBooking } from '../models/Booking';
 
 // Function to generate time slots in 30-minute intervals
@@ -8,48 +9,77 @@ export const generateTimeSlots = (
   selectedDate: string
 ): string[] => {
   const slots: string[] = [];
-  let openHour = parseInt(open.slice(0, 2));
-  let openMinute = parseInt(open.slice(2));
-  let closeHour = parseInt(close.slice(0, 2));
-  let closeMinute = parseInt(close.slice(2));
+  // let openHour = parseInt(open.slice(0, 2));
+  // let openMinute = parseInt(open.slice(2));
+  // let closeHour = parseInt(close.slice(0, 2));
+  // let closeMinute = parseInt(close.slice(2));
+  const openTime = moment.tz(
+    `${selectedDate} ${open.slice(0, 2)}:${open.slice(2)}`,
+    'YYYY-MM-DD HH:mm',
+    'Europe/Helsinki'
+  );
+  const closeTime = moment.tz(
+    `${selectedDate} ${close.slice(0, 2)}:${close.slice(2)}`,
+    'YYYY-MM-DD HH:mm',
+    'Europe/Helsinki'
+  );
+  console.log('openTime ', openTime);
+  console.log('closeTime ', closeTime);
 
   // Get today's date in YYYY-MM-DD format
-  const today = new Date();
-  const todayDate = today.toISOString().split('T')[0];
+  const todayDate = moment.tz('Europe/Helsinki').format('YYYY-MM-DD');
+  console.log('todayDate  ', todayDate);
+  // const todayDate = today.toISOString().split('T')[0];
 
   // Get the current time in HHMM format
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTime = currentHour * 100 + currentMinute;
+  const now = moment.tz('Europe/Helsinki');
+  console.log('now  ', now);
+  let currentSlotTime = openTime.clone();
+  console.log('currentSlotTime ', currentSlotTime);
+  //const now = new Date();
+  // const currentHour = now.getHours();
+  // const currentMinute = now.getMinutes();
+  // const currentTime = currentHour * 100 + currentMinute;
 
-  while (
-    openHour < closeHour ||
-    (openHour === closeHour && openMinute < closeMinute)
-  ) {
-    const slot = `${String(openHour).padStart(2, '0')}${String(
-      openMinute
-    ).padStart(2, '0')}`;
-
-    // Convert slot time to an integer for comparison
-    const slotTime = parseInt(slot);
-
-    // Filter slots only for today, allow all slots for other dates
+  while (currentSlotTime.isBefore(closeTime)) {
+    const slot = currentSlotTime.format('HHmm');
     if (selectedDate === todayDate) {
-      if (slotTime >= currentTime) {
+      if (currentSlotTime.isSameOrAfter(now)) {
         slots.push(slot);
       }
     } else {
       slots.push(slot);
     }
-
-    openMinute += 30;
-
-    if (openMinute >= 60) {
-      openMinute = 0;
-      openHour += 1;
-    }
+    currentSlotTime.add(30, 'minutes')
   }
+
+  // while (
+  //   openHour < closeHour ||
+  //   (openHour === closeHour && openMinute < closeMinute)
+  // ) {
+  //   const slot = `${String(openHour).padStart(2, '0')}${String(
+  //     openMinute
+  //   ).padStart(2, '0')}`;
+
+  //   // Convert slot time to an integer for comparison
+  //   const slotTime = parseInt(slot);
+
+  //   // Filter slots only for today, allow all slots for other dates
+  //   if (selectedDate === todayDate) {
+  //     if (slotTime >= currentTime) {
+  //       slots.push(slot);
+  //     }
+  //   } else {
+  //     slots.push(slot);
+  //   }
+
+  //   openMinute += 30;
+
+  //   if (openMinute >= 60) {
+  //     openMinute = 0;
+  //     openHour += 1;
+  //   }
+  // }
   return slots;
 };
 

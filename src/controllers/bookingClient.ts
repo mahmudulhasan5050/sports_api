@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import moment from 'moment-timezone';
 
 import bookingClientServices from '../services/bookingClient';
 import Booking, { IBooking } from '../models/Booking';
@@ -32,11 +33,13 @@ export const getAvailableTime = async (
         .status(400)
         .json({ error: 'Date and facility name are required' });
     }
-
-    // Parse date and find the day of the week
-    const convertStringToDate = new Date(selectedDate as string);
+    const convertStringToDate = moment.tz(
+      selectedDate,
+      'YYYY-MM-DD',
+      'Europe/Helsinki'
+    );
     const findDayStringFromDate = convertStringToDate
-      .toLocaleString('en-US', { weekday: 'long' })
+      .format('dddd')
       .toLowerCase();
 
     // Find the facility by name
@@ -89,6 +92,7 @@ export const getAvailableCourt = async (
   next: NextFunction
 ) => {
   const { facilityName, selectedDate, selectedTime } = req.body;
+  const bookedFacilityIds = new Set<mongoose.Types.ObjectId>();
   try {
     // Find the facility by name
     const facilities: IFacility[] = await Facility.find({
@@ -113,11 +117,11 @@ export const getAvailableCourt = async (
         return !(
           booking.facility.equals(facility._id as mongoose.Types.ObjectId) &&
           selectedTime < booking.endTime &&
-          selectedTime >= booking.startTime
+          addMinutes(selectedTime, 30) >= booking.startTime
         );
       });
     });
-
+    //console.log(availableCourts);
     res.status(200).json({ availableCourts });
   } catch (error) {
     next(new BadRequestError('Invalid Request', error));
@@ -130,10 +134,9 @@ export const getAvailableDuration = async (
   next: NextFunction
 ) => {
   //no need: facilityName here
-  const { facilityName, selectedDate, selectedTime, selectedFacilityId } =
-    req.body;
+  const { selectedDate, selectedTime, selectedFacilityId } = req.body;
   try {
-    const validDurations = [30, 60, 90]; //customer wanted strict game duration for booking
+    const validDurations = [60, 90]; //customer wanted strict game duration for booking
     // Find bookings for the selected date
     const bookings = await Booking.find({
       facility: selectedFacilityId,
@@ -141,13 +144,9 @@ export const getAvailableDuration = async (
       isCancelled: false,
     }).select('facility startTime endTime duration');
 
-    //Find possible durations for booking [30,60,90]
+    //Find possible durations for booking [60,90]
     bookings.filter((booking) => {
       if (selectedTime < booking.endTime) {
-        if (addMinutes(selectedTime, 30) > booking.startTime) {
-          const index = validDurations.indexOf(30);
-          if (index > -1) validDurations.splice(index, 1);
-        }
         if (addMinutes(selectedTime, 60) > booking.startTime) {
           const index = validDurations.indexOf(60);
           if (index > -1) validDurations.splice(index, 1);
@@ -229,7 +228,7 @@ export const cancelBookingByUser = async (
       const cancelSuccess = await bookingClientServices.cancelBookingByUser(
         booking
       );
-  
+
       res.status(204).json(cancelSuccess);
     }
   } catch (error) {
@@ -237,7 +236,7 @@ export const cancelBookingByUser = async (
   }
 };
 
-// // delete booking by user (KEEP IT)
+// // delete booking by user (****KEEP IT FOR FUTURE USE****)
 // export const deleteBookingByUser = async (
 //   req: Request,
 //   res: Response,

@@ -19,6 +19,7 @@ import facilityRouter from './routes/facility'
 import openingHourRouter from './routes/openingHour/openingHour'
 import bookingRouter from './routes/booking'
 import authRouter from './routes/auth'
+import checkoutRouter from './routes/checkout'
 import bookingClientRouter from './routes/bookingClient'
 import bookingClientFinalRouter from './routes/bookingClientFinal';
 import { googleStrategy, jwtStrategy } from './config/passport';
@@ -66,15 +67,14 @@ app.use('/api/v1/facility', facilityRouter)
 app.use('/api/v1/openinghour', openingHourRouter)
 //app.use('/api/v1/exceptionday', exceptionDayRouter)    //to do. later
 app.use('/api/v1/booking', bookingRouter)
-
 //when client is checking schedules for booking (no auth)
 app.use('/api/v1/booking-client', bookingClientRouter)
 //user auth needed
 app.use('/api/v1/booking-client-final', bookingClientFinalRouter)
-
-
 //auth
 app.use('/api/v1/auth', authRouter)
+//stripe
+app.use('/api/v1/checkout', checkoutRouter)
 
 //handle error
 app.use((req: Request, res: Response, next: NextFunction) => {
