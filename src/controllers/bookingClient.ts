@@ -124,8 +124,7 @@ console.log("::::::::::",facilityName, typeof(selectedDate), selectedTime)
         return !(
           booking.facility.equals(facility._id as mongoose.Types.ObjectId) &&
           selectedTime < booking.endTime &&
-          selectedTime >= booking.startTime
-        
+          addMinutes(selectedTime,30) >= booking.startTime   
         );
       });
     });
