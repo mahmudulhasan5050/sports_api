@@ -96,7 +96,7 @@ export const getAvailableCourt = async (
   next: NextFunction
 ) => {
   const { facilityName, selectedDate, selectedTime } = req.body;
-console.log("::::::::::",facilityName, typeof(selectedDate), selectedTime)
+
   try {
     // Find the facility by name
     const facilities: IFacility[] = await Facility.find({
@@ -147,9 +147,13 @@ export const getAvailableDuration = async (
     // Find bookings for the selected date
     const bookings = await Booking.find({
       facility: selectedFacilityId,
-      date: selectedDate,
+      date: {
+        $gte: moment(selectedDate).startOf('day').toDate(), // Start of the day ($gte- greater than or equal)
+        $lt: moment(selectedDate).endOf('day').toDate(),   // End of the day ($lt- less than)
+      },
       isCancelled: false,
     }).select('facility startTime endTime duration');
+    console.log("::::::: booking  ",bookings)
 
     //Find possible durations for booking [60,90]
     bookings.filter((booking) => {
