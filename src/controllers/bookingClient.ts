@@ -41,6 +41,10 @@ export const getAvailableTime = async (
     const findDayStringFromDate = convertStringToDate
       .format('dddd')
       .toLowerCase();
+    // const convertStringToDate = new Date(selectedDate as string);
+    // const findDayStringFromDate = convertStringToDate
+    //   .toLocaleString('en-US', { weekday: 'long' })
+    //   .toLowerCase();
 
     // Find the facility by name
     const facility = await Facility.find({ type: facilityName });
@@ -92,7 +96,7 @@ export const getAvailableCourt = async (
   next: NextFunction
 ) => {
   const { facilityName, selectedDate, selectedTime } = req.body;
-  const bookedFacilityIds = new Set<mongoose.Types.ObjectId>();
+console.log("::::::::::",facilityName, typeof(selectedDate), selectedTime)
   try {
     // Find the facility by name
     const facilities: IFacility[] = await Facility.find({
@@ -107,7 +111,10 @@ export const getAvailableCourt = async (
     const bookings = await Booking.find({
       facility: { $in: facilityIds },
       isCancelled: false,
-      date: selectedDate,
+      date: {
+        $gte: moment(selectedDate).startOf('day').toDate(), // Start of the day ($gte- greater than or equal)
+        $lt: moment(selectedDate).endOf('day').toDate(),   // End of the day ($lt- less than)
+      },
     }).select('facility startTime endTime duration');
 
     // Filter out booked facilities considering the selected time
@@ -117,7 +124,8 @@ export const getAvailableCourt = async (
         return !(
           booking.facility.equals(facility._id as mongoose.Types.ObjectId) &&
           selectedTime < booking.endTime &&
-          addMinutes(selectedTime, 30) >= booking.startTime
+          selectedTime >= booking.startTime
+        
         );
       });
     });

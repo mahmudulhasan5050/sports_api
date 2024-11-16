@@ -30,7 +30,7 @@ export const createBooking = async (
 
   const facilityId = req.params.facilityId;
   const { date, time, duration, paymentAmount, isPaid } = req.body;
-
+console.log(typeof(date))
   //check facilityId is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(facilityId)) {
     throw new BadRequestError('Invalid facility ID');
@@ -64,9 +64,10 @@ export const createBooking = async (
       paymentAmount,
       isPaid,
     });
-
+console.log("newBooking  ",newBooking)
     // call service function to save in database¨
     const createSuccess = await bookingServices.createBooking(newBooking);
+    console.log("createSucces ", createSuccess)
     //------------------start from here-----------------------------------------
     if (createSuccess) {
       const pupulatedOtherData = await createSuccess.populate([

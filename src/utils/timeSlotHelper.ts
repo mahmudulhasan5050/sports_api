@@ -3,16 +3,17 @@ import moment from 'moment-timezone';
 import { IBooking } from '../models/Booking';
 
 // Function to generate time slots in 30-minute intervals
+// Here openTime and closeTime convert kora hoise Moment diye.
+// Ajker date neya hoise and ajker time neya hoise as now.
+// While loop a jodi ajker date hoy tahole slot create hobe koyta baje tar upor.
+// Mane holo ajke er date a joto time gese tar por theke slot gula create hobe.
+// But porer din gulate pura diner slot create hobe open and closing hours er upor base kore.
 export const generateTimeSlots = (
   open: string,
   close: string,
   selectedDate: string
 ): string[] => {
   const slots: string[] = [];
-  // let openHour = parseInt(open.slice(0, 2));
-  // let openMinute = parseInt(open.slice(2));
-  // let closeHour = parseInt(close.slice(0, 2));
-  // let closeMinute = parseInt(close.slice(2));
   const openTime = moment.tz(
     `${selectedDate} ${open.slice(0, 2)}:${open.slice(2)}`,
     'YYYY-MM-DD HH:mm',
@@ -23,23 +24,19 @@ export const generateTimeSlots = (
     'YYYY-MM-DD HH:mm',
     'Europe/Helsinki'
   );
-  console.log('openTime ', openTime);
-  console.log('closeTime ', closeTime);
+  // console.log('openTime ', openTime);
+  // console.log('closeTime ', closeTime);
 
   // Get today's date in YYYY-MM-DD format
   const todayDate = moment.tz('Europe/Helsinki').format('YYYY-MM-DD');
-  console.log('todayDate  ', todayDate);
+  //console.log('todayDate  ', todayDate);
   // const todayDate = today.toISOString().split('T')[0];
 
   // Get the current time in HHMM format
   const now = moment.tz('Europe/Helsinki');
-  console.log('now  ', now);
+  //console.log('now  ', now);
   let currentSlotTime = openTime.clone();
-  console.log('currentSlotTime ', currentSlotTime);
-  //const now = new Date();
-  // const currentHour = now.getHours();
-  // const currentMinute = now.getMinutes();
-  // const currentTime = currentHour * 100 + currentMinute;
+  //console.log('currentSlotTime ', currentSlotTime);
 
   while (currentSlotTime.isBefore(closeTime)) {
     const slot = currentSlotTime.format('HHmm');
@@ -53,33 +50,6 @@ export const generateTimeSlots = (
     currentSlotTime.add(30, 'minutes')
   }
 
-  // while (
-  //   openHour < closeHour ||
-  //   (openHour === closeHour && openMinute < closeMinute)
-  // ) {
-  //   const slot = `${String(openHour).padStart(2, '0')}${String(
-  //     openMinute
-  //   ).padStart(2, '0')}`;
-
-  //   // Convert slot time to an integer for comparison
-  //   const slotTime = parseInt(slot);
-
-  //   // Filter slots only for today, allow all slots for other dates
-  //   if (selectedDate === todayDate) {
-  //     if (slotTime >= currentTime) {
-  //       slots.push(slot);
-  //     }
-  //   } else {
-  //     slots.push(slot);
-  //   }
-
-  //   openMinute += 30;
-
-  //   if (openMinute >= 60) {
-  //     openMinute = 0;
-  //     openHour += 1;
-  //   }
-  // }
   return slots;
 };
 
