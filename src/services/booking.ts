@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { NotFoundError } from '../apiErrors/apiErrors';
 import Booking, { IBooking } from '../models/Booking';
+import moment from 'moment-timezone';
 
 //get all
 const allBooking = async () => {
@@ -20,7 +21,13 @@ const getBookingById = async (bookingId: string) => {
 
 //get by date
 const getBookingByDate = async (date: string) => {
-  return await Booking.find({ date, isCancelled: false })
+  return await Booking.find({
+    date: {
+      $gte: moment(date).startOf('day').toDate(), // Start of the day ($gte- greater than or equal)
+      $lt: moment(date).endOf('day').toDate(), // End of the day ($lt- less than)
+    },
+    isCancelled: false,
+  })
     .populate('user', 'name email role')
     .populate('facility', 'type courtNumber');
 };
@@ -40,7 +47,9 @@ const updateBooking = async (
     bookingId,
     updatedBookingFromBody,
     { new: true }
-  );
+  )
+    .populate('user', 'name email role')
+    .populate('facility', 'type courtNumber');
   if (!findAndUpdate)
     throw new NotFoundError('Can not update booking information!!');
   return findAndUpdate;

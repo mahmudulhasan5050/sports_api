@@ -54,13 +54,14 @@ router.post(
 
 //update one Booking
 router.post(
-  '/:bookingId',
+  '/update/:bookingId',
   passport.authenticate('jwt', { session: false }),
   adminAuthMiddleware,
   updateBooking
 ); //check is it being used or not
 
 router.post('/refund/:bookingId', updateRefund); // Do we need POST method to edit isRefund: true.
+
 
 //delete Booking
 router.delete(

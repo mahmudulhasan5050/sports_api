@@ -32,7 +32,6 @@ export const checkoutStripe = async (
       cancel_url: clientURL,
     });
     
-    console.log(session.url);
     //res.redirect(session.url ?? `${clientURL}/payment-error`);
     res.status(200).json({ url: session.url });
   } catch (error) {
@@ -48,7 +47,7 @@ export const verifyPaymentStripe = async (
   const { session_id } = req.body;
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    console.log(session);
+
     if (session.payment_status === 'paid') {
       res.status(200).json({ payment: true });
     } else {

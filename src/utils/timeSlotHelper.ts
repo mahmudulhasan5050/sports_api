@@ -24,19 +24,14 @@ export const generateTimeSlots = (
     'YYYY-MM-DD HH:mm',
     'Europe/Helsinki'
   );
-  // console.log('openTime ', openTime);
-  // console.log('closeTime ', closeTime);
 
   // Get today's date in YYYY-MM-DD format
   const todayDate = moment.tz('Europe/Helsinki').format('YYYY-MM-DD');
-  //console.log('todayDate  ', todayDate);
   // const todayDate = today.toISOString().split('T')[0];
 
   // Get the current time in HHMM format
   const now = moment.tz('Europe/Helsinki');
-  //console.log('now  ', now);
   let currentSlotTime = openTime.clone();
-  //console.log('currentSlotTime ', currentSlotTime);
 
   while (currentSlotTime.isBefore(closeTime)) {
     const slot = currentSlotTime.format('HHmm');

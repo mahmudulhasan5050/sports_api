@@ -118,7 +118,7 @@ export const signIn = async (
       }
 
       const token = await authServices.signIn(user);
-      console.log(typeof token + '--', token);
+  
       res.status(200).json(token);
     } else {
       res.status(401).json('Unauthorized Error');
@@ -210,7 +210,7 @@ export const googleRedirect = async (
   if (user) {
     try {
       const token = await authServices.signIn(user);
-      console.log('gggggg::::::: ', token);
+
       //redirect
       const encodedToken = encodeURIComponent(token);
       res.redirect(`${clientURL}/google-auth-success/${encodedToken}`);

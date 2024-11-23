@@ -12,6 +12,7 @@ import Facility from '../models/Facility';
 import mongoose from 'mongoose';
 import User from '../models/User';
 import { addMinutes } from '../utils/timeSlotHelper';
+import moment from 'moment-timezone';
 
 //get all booking
 export const allBooking = async (
@@ -51,8 +52,9 @@ export const getBookingByDate = async (
   next: NextFunction
 ) => {
   const date = req.params.date;
-
-  try {
+  const selectedDate = moment(date).toDate()
+  
+try {
     const bookingByDateSuccess = await bookingServices.getBookingByDate(date);
 
     res.status(200).json(bookingByDateSuccess);

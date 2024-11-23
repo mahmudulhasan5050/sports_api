@@ -41,10 +41,6 @@ export const getAvailableTime = async (
     const findDayStringFromDate = convertStringToDate
       .format('dddd')
       .toLowerCase();
-    // const convertStringToDate = new Date(selectedDate as string);
-    // const findDayStringFromDate = convertStringToDate
-    //   .toLocaleString('en-US', { weekday: 'long' })
-    //   .toLowerCase();
 
     // Find the facility by name
     const facility = await Facility.find({ type: facilityName });
@@ -128,7 +124,7 @@ export const getAvailableCourt = async (
         );
       });
     });
-    //console.log(availableCourts);
+
     res.status(200).json({ availableCourts });
   } catch (error) {
     next(new BadRequestError('Invalid Request', error));
@@ -153,7 +149,6 @@ export const getAvailableDuration = async (
       },
       isCancelled: false,
     }).select('facility startTime endTime duration');
-    console.log("::::::: booking  ",bookings)
 
     //Find possible durations for booking [60,90]
     bookings.filter((booking) => {
@@ -277,7 +272,6 @@ export const cancelBookingByUser = async (
 //       const deleteSuccess = await bookingClientServices.deleteBookingByUser(
 //         bookingId
 //       );
-//       console.log('deleteSuccess controller:: ', deleteSuccess);
 //       res.status(204).json(deleteSuccess);
 //     }
 //   } catch (error) {

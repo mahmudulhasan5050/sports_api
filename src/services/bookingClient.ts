@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { NotFoundError } from '../apiErrors/apiErrors';
 import Booking, { IBooking } from '../models/Booking';
+import moment from 'moment-timezone';
 
 // get available time
 const getAvailableTime = async(facilityIds:mongoose.Types.ObjectId[],selectedDate:string) =>{
@@ -8,7 +9,10 @@ const getAvailableTime = async(facilityIds:mongoose.Types.ObjectId[],selectedDat
   const bookings = await Booking.find({
     facility: { $in: facilityIds },
     isCancelled: false, //*************************** */
-    date: selectedDate,
+    date: {
+      $gte: moment(selectedDate).startOf('day').toDate(), // Start of the day ($gte- greater than or equal)
+      $lt: moment(selectedDate).endOf('day').toDate(),   // End of the day ($lt- less than)
+    },
   });
   
   return bookings
