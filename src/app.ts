@@ -65,7 +65,7 @@ app.use('/api/v1/facilityunit1', facilityUnitRouter)
 app.use('/api/v1/facility', facilityRouter)
 //opening hour 
 app.use('/api/v1/openinghour', openingHourRouter)
-//app.use('/api/v1/exceptionday', exceptionDayRouter)    //to do. later
+//admin booking   
 app.use('/api/v1/booking', bookingRouter)
 //when client is checking schedules for booking (no auth)
 app.use('/api/v1/booking-client', bookingClientRouter)

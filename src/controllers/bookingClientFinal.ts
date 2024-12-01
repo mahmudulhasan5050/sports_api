@@ -51,7 +51,6 @@ export const createBooking = async (
     });
     if (isExist) throw new AlreadyExistError();
 
-    //create new facility according to user input
     const endTime = addMinutes(time, duration);
 
     const newBooking = new Booking({

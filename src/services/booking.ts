@@ -2,14 +2,22 @@ import mongoose from 'mongoose';
 import { NotFoundError } from '../apiErrors/apiErrors';
 import Booking, { IBooking } from '../models/Booking';
 import moment from 'moment-timezone';
+import User from '../models/User';
 
 //get all
-const allBooking = async () => {
+const allBooking = async (page: number, limit: number, skip: number) => {
   const allBooking = await Booking.find({ isCancelled: false })
+    .skip(skip)
+    .limit(limit)
+    .sort({ date: -1 })
     .populate('user', 'name email role')
     .populate('facility', 'type courtNumber');
+  const bookings = allBooking.filter(
+    (booking) => booking.isCancelled === false
+  );
+  const totalBookingsssss = await Booking.countDocuments();
 
-  return allBooking.filter((booking) => booking.isCancelled === false);
+  return { bookings, totalBookingsssss };
 };
 
 //Get by id
@@ -30,6 +38,51 @@ const getBookingByDate = async (date: string) => {
   })
     .populate('user', 'name email role')
     .populate('facility', 'type courtNumber');
+};
+
+//dashboard info
+const getDashboardInfo = async () => {
+  const timezone = 'Europe/Helsinki';
+  const startOfCurrentMonth = moment.tz(timezone).startOf('month').toDate();
+  const endOfCurrentMonth = moment.tz(timezone).endOf('month').toDate();
+  const startOfLastMonth = moment
+    .tz(timezone)
+    .subtract(1, 'month')
+    .startOf('month')
+    .toDate();
+  const endOfLastMonth = moment
+    .tz(timezone)
+    .subtract(1, 'month')
+    .endOf('month')
+    .toDate();
+
+  const currentMonthCount = await Booking.countDocuments({
+    date: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth },
+    isCancelled: false,
+  });
+
+  const lastMonthCount = await Booking.countDocuments({
+    date: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+    isCancelled: false,
+  });
+  const totalCancelledThisMonth = await Booking.countDocuments({
+    date: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth },
+    isCancelled: true,
+  });
+  const totalNotRefunded = await Booking.countDocuments({
+    date: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth  },
+    isCancelled: true,
+    isRefunded:false
+  })
+  const totalUser = await User.countDocuments();
+
+  return {
+    currentMonthCount,
+    lastMonthCount,
+    totalUser,
+    totalCancelledThisMonth,
+    totalNotRefunded
+  };
 };
 
 //create
@@ -59,7 +112,6 @@ const updateBooking = async (
 const getUnpaidRefund = async () => {
   const allUnpaidRefundBooking = await Booking.find({
     isCancelled: true,
-    isRefunded: false,
   })
     .populate('user', 'name email role')
     .populate('facility', 'type courtNumber');
@@ -69,7 +121,7 @@ const getUnpaidRefund = async () => {
 
 // refund Update
 const updateRefund = async (booking: IBooking) => {
-  return await Booking.findByIdAndUpdate(booking._id, booking, { new: true });
+  return await Booking.findByIdAndUpdate(booking._id, booking, { new: true }).populate('user', 'name email').populate('facility', 'type courtNumber');
 };
 
 //delete
@@ -84,6 +136,7 @@ export default {
   allBooking,
   getBookingById,
   getBookingByDate,
+  getDashboardInfo,
   createAdminBooking,
   updateBooking,
   getUnpaidRefund,

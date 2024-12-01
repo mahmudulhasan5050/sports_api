@@ -6,6 +6,7 @@ import {
   updateBooking,
   deleteBooking,
   getBookingById,
+  getDashboardInfo,
   getBookingByDate,
   getUnpaidRefund,
   updateRefund,
@@ -17,16 +18,26 @@ const router = express.Router();
 
 //get all
 router.get(
-  '/',
+  '/limit-30/:page',
   passport.authenticate('jwt', { session: false }),
   adminAuthMiddleware,
   allBooking
 );
 
+//get refund info
 router.get(
   '/refund',
+  passport.authenticate('jwt', { session: false }),
+  adminAuthMiddleware,
   getUnpaidRefund
 );
+
+//get info for dashboard
+router.get('/dashboard',
+  passport.authenticate('jwt', {session: false}),
+  adminAuthMiddleware,
+  getDashboardInfo
+)
 
 //get by id
 router.get(
@@ -35,6 +46,7 @@ router.get(
   adminAuthMiddleware,
   getBookingById
 );
+
 
 //get booking by date
 router.get(
@@ -60,7 +72,7 @@ router.post(
   updateBooking
 ); //check is it being used or not
 
-router.post('/refund/:bookingId', updateRefund); // Do we need POST method to edit isRefund: true.
+router.post('/refund/:bookingId', updateRefund);
 
 
 //delete Booking

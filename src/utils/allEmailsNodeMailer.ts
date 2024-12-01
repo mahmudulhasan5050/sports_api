@@ -1,5 +1,6 @@
+import moment from 'moment-timezone';
 import { transporter } from '../config/nodemailer';
-import Booking, { IBooking } from '../models/Booking';
+import { IBooking } from '../models/Booking';
 import { IUser } from '../models/User';
 import { MailOptionType } from '../types/MailOptionsType';
 import { clientURL, emailSender } from './secrets';
@@ -26,8 +27,8 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
               <p><strong>Facility:</strong> ${booking.facility.type} ${
       booking.facility.courtNumber
     }</p>
-              <p><strong>Date:</strong> ${booking.date}</p>
-              <p><strong>Time:</strong> ${booking.startTime}</p>
+              <p><strong>Date:</strong> ${moment(booking.date).format('DD-MM-YYYY')}</p>
+              <p><strong>Time:</strong> ${moment(booking.startTime, 'HHmm').format('HH:mm')}</p>
               <p><strong>Duration:</strong> ${booking.duration / 60} hour/s</p>
             </div>
             <p style="color: #555;">If you have any questions or need to cancel your booking, please cancel your booking 12 hours before of your booking time.</p>

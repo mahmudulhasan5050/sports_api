@@ -13,18 +13,23 @@ import mongoose from 'mongoose';
 import User from '../models/User';
 import { addMinutes } from '../utils/timeSlotHelper';
 import moment from 'moment-timezone';
+import { calculateDuration } from '../utils/calculationDuration';
 
-//get all booking
+//get all booking with limit 30 bookings
 export const allBooking = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const page = parseInt(req.body.page);
+  const limit = 30;
+  const skip = (page - 1) * limit;
+
 
   try {
-    const findAllBookings = await bookingServices.allBooking();
+    const bookings30 = await bookingServices.allBooking(page, limit, skip);
 
-    res.status(200).json(findAllBookings);
+    res.status(200).json(bookings30);
   } catch (error) {
     next(new BadRequestError('Invalid Request', error));
   }
@@ -52,7 +57,6 @@ export const getBookingByDate = async (
   next: NextFunction
 ) => {
   const date = req.params.date;
-  const selectedDate = moment(date).toDate()
   
 try {
     const bookingByDateSuccess = await bookingServices.getBookingByDate(date);
@@ -63,13 +67,27 @@ try {
   }
 };
 
+//dashboard info
+export const getDashboardInfo = async(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) =>{
+  try {
+    const allInfo = await bookingServices.getDashboardInfo()
+    res.status(200).json(allInfo)
+  } catch (error) {
+    next(new BadRequestError('Invalid Request', error));
+  }
+}
+
 //create booking
 export const createAdminBooking = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { email, facilityId, date, startTime, duration } = req.body;
+  const { email, facilityId, date, startTime, endTime } = req.body;
 
   try {
     //check facilityId exist'
@@ -86,23 +104,30 @@ export const createAdminBooking = async (
     // check existance
     const isExist = await Booking.findOne({
       facility: facilityId,
-      date: date,
-      startTime: startTime,
+      date: {
+        $gte: moment(date).startOf('day').toDate(), // Start of the day ($gte- greater than or equal)
+        $lt: moment(date).endOf('day').toDate(),   // End of the day ($lt- less than)
+      },
+      $or: [
+        {
+          startTime: { $lt: endTime }, // Existing booking starts before the new booking ends
+          endTime: { $gt: startTime }, // Existing booking ends after the new booking starts
+        },
+        {
+          startTime: { $eq: startTime }, // Optional: Exact match for start time
+          endTime: { $eq: endTime },     // Optional: Exact match for end time
+        },
+      ],
     });
-    if (isExist) {
-      next(new AlreadyExistError());
-    }
+    if (!isExist) {
+      const duration = calculateDuration(startTime, endTime)
 
-    const endTime = addMinutes(startTime, duration);
-
-    //create new facility according to user input
     const newBooking = new Booking({
       user: userExist?._id,
       facility: facilityId,
       date: date,
       startTime: startTime,
       endTime: endTime,
-      isPaid: true,
       paymentAmount: 0,
       duration: duration,
     });
@@ -110,6 +135,12 @@ export const createAdminBooking = async (
     // call service function to save in database¨
     const createSuccess = await bookingServices.createAdminBooking(newBooking);
     res.status(200).json(createSuccess);
+   
+    }else{
+      next(new AlreadyExistError());
+    }
+ 
+
   } catch (error) {
     next(new BadRequestError('Can not create booking', error));
   }
@@ -142,7 +173,7 @@ export const updateBooking = async (
   }
 };
 
-// get booking which has pending refund
+// get booking which has pending refund amount to pay to customer
 export const getUnpaidRefund = async (
   req: Request,
   res: Response,
@@ -171,6 +202,7 @@ export const updateRefund = async (
     if (isExist) {
       isExist.isRefunded = true;
       const refundSuccess = await bookingServices.updateRefund(isExist);
+      res.status(201).json(refundSuccess)
     } else {
       next(new NotFoundError());
     }
