@@ -14,6 +14,7 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
   ) {
     throw new Error('Booking data is not fully populated.');
   }
+  console.log("booking",booking)
   const mailOptions = {
     from: emailSender,
     to: booking.user.email,
@@ -27,8 +28,8 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
               <p><strong>Facility:</strong> ${booking.facility.type} ${
       booking.facility.courtNumber
     }</p>
-              <p><strong>Date:</strong> ${moment(booking.date).format('DD-MM-YYYY')}</p>
-              <p><strong>Time:</strong> ${moment(booking.startTime, 'HHmm').format('HH:mm')}</p>
+              <p><strong>Date:</strong> ${booking.date}</p>
+              <p><strong>Time:</strong> ${booking.startTime}</p>
               <p><strong>Duration:</strong> ${booking.duration / 60} hour/s</p>
             </div>
             <p style="color: #555;">If you have any questions or need to cancel your booking, please cancel your booking 12 hours before of your booking time.</p>
@@ -40,13 +41,15 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
   } as MailOptionType;
   try {
     const emailDelivery = await transporter.sendMail(mailOptions);
+    console.log("emailDelivery  ",emailDelivery)
     if (emailDelivery.accepted[0] === booking.user.email) {
       return true;
     } else {
       return false;
     }
   } catch (error) {
-    return false;
+    console.log("Error:::::::::: ", error)
+    
   }
 };
 
@@ -85,7 +88,7 @@ export const sendRegistrationConfirmationEmail = async (user: IUser) => {
       return false;
     }
   } catch (error) {
-    return false;
+    console.log("Error:::::::::: ", error)
   }
 };
 
@@ -126,7 +129,7 @@ export const sendResetPasswordEmail = async (user: IUser) => {
       return false;
     }
   } catch (error) {
-    return false;
+    console.log("Error:::::::::: ", error)
   }
 };
 

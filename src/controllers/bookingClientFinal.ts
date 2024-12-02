@@ -67,7 +67,7 @@ export const createBooking = async (
 
     // call service function to save in database¨
     const createSuccess = await bookingServices.createBooking(newBooking);
-
+    console.log("createSuccess",createSuccess)
     //------------------start from here-----------------------------------------
     if (createSuccess) {
       const pupulatedOtherData = await createSuccess.populate([
@@ -75,6 +75,7 @@ export const createBooking = async (
         { path: 'facility' },
       ]);
       //Need to apply email is sent or not
+      console.log("pupulatedOtherData",pupulatedOtherData)
       await sendBookingConfirmationEmail(pupulatedOtherData);
     }
     res.status(200).json(createSuccess);
