@@ -48,8 +48,7 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
       return false;
     }
   } catch (error) {
-    console.log("Error:::::::::: ", error)
-    
+    console.log("Error:::::::::: ", error)   
   }
 };
 
