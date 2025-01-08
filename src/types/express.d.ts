@@ -19,3 +19,8 @@
 //     }
 //   }
 // }
+// namespace Express {
+//     interface AuthInfo {
+//       redirectURL?: string;
+//     }
+//   }

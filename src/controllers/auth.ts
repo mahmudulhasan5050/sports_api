@@ -200,18 +200,51 @@ export const resetPassword = async (
   }
 };
 
+// export const googleRedirect = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const user = req.user as IUser;
+// console.log("user:::::   ", user)
+//   if (user) {
+//     try {
+//       const token = await authServices.signIn(user);
+
+//       //redirect
+//       const encodedToken = encodeURIComponent(token);
+//       res.redirect(`${clientURL}/google-auth-success/${encodedToken}`);
+//     } catch (error) {
+//       next(new BadRequestError());
+//     }
+//   } else {
+//     const redirectURL = (req.authInfo as any)?.redirectURL;
+//     console.log("redirectURL     ",redirectURL)
+//     if (redirectURL) {
+//       res.redirect(`${clientURL}${redirectURL}`);
+//     } else {
+//       console.log("URL     ",redirectURL)
+//       next(new UnauthorizedError());
+//     }
+//   }
+// };
 export const googleRedirect = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const user = req.user as IUser;
-
-  if (user) {
+  const redirectURL = (req.authInfo as any)?.redirectURL;
+console.log("redirectURL    ",redirectURL)
+  if (redirectURL) {
+    // Redirect to the client with the custom error message
+    console.log("redirectURL  ",redirectURL)
+    res.redirect(`${clientURL}${redirectURL}`);
+  } else if (req.user) {
+    const user = req.user as IUser;
     try {
       const token = await authServices.signIn(user);
 
-      //redirect
+      // Redirect to the client with a successful token
       const encodedToken = encodeURIComponent(token);
       res.redirect(`${clientURL}/google-auth-success/${encodedToken}`);
     } catch (error) {

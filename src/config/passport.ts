@@ -51,9 +51,19 @@ export const googleStrategy = new GoogleStrategy.Strategy(
           if(user.googleId){
             return done(null, user);
           }else{
-            const error = new Error("Please use email/password to sign in.");
-            (error as any).customMessage = "User exists but sign-in method is email/password.";
-            return done(error, false);
+         //   const error = new Error("Please use email/password to sign in.");
+            const findAndUpdate = await User.findByIdAndUpdate(
+              user._id,
+              {googleId: profile.id},
+              { new: true }
+            );
+            if(findAndUpdate){
+              console.log("data saved from google")
+              return done(null, findAndUpdate);
+            }else{
+              return done(new Error('Data could not be saved!'));
+            }
+       
           }
         } else {
           const newUser = new User({
