@@ -7,33 +7,40 @@ import {
   ForbiddenError,
 } from '../apiErrors/apiErrors';
 import { clientURL } from '../utils/secrets';
+import Facility from '../models/Facility';
 
 export const checkoutStripe = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const { facilityId, paymentAmount } = req.body;
+
   try {
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: 'tennis 1',
+    const facility = await Facility.findById(facilityId);
+    if (facility) {
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: `${facility.type} ${facility.courtNumber}`,
+              },
+              unit_amount: paymentAmount * 100,
             },
-            unit_amount: 10 * 100,
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${clientURL}/payment-success/{CHECKOUT_SESSION_ID}`,
-      cancel_url: clientURL,
-    });
-    
-    //res.redirect(session.url ?? `${clientURL}/payment-error`);
-    res.status(200).json({ url: session.url });
+        ],
+        mode: 'payment',
+        success_url: `${clientURL}/payment-success/{CHECKOUT_SESSION_ID}`,
+        cancel_url: clientURL,
+      });
+
+      //res.redirect(session.url ?? `${clientURL}/payment-error`);
+      res.status(200).json({ url: session.url, sessionId: session.id });
+    }
+    res.status(404);
   } catch (error) {
     next(new BadRequestError());
   }

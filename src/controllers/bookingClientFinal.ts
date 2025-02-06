@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import bookingServices from '../services/bookingClientFinal';
-import nodemailer from 'nodemailer';
 
 import Booking from '../models/Booking';
 import {
@@ -13,9 +12,8 @@ import Facility from '../models/Facility';
 import { addMinutes } from '../utils/timeSlotHelper';
 import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
-import {
-  sendBookingConfirmationEmail,
-} from '../utils/allEmailsNodeMailer';
+import { sendBookingConfirmationEmail } from '../utils/allEmailsNodeMailer';
+
 
 //create booking
 export const createBooking = async (
@@ -29,14 +27,16 @@ export const createBooking = async (
   }
 
   const facilityId = req.params.facilityId;
-  const { date, time, duration, paymentAmount, isPaid, paymentAtCounter } = req.body;
+  const { date, time, duration, paymentAmount, isPaid, paymentAtCounter } =
+    req.body;
 
   //check facilityId is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(facilityId)) {
     throw new BadRequestError('Invalid facility ID');
   }
+  
   try {
-    //check facilityId exist'
+    //check facilityId exist
     const facilityExist = await Facility.findById(facilityId);
     if (!facilityExist) throw new NotFoundError();
     const userExist = await User.findById(user._id);
@@ -62,12 +62,12 @@ export const createBooking = async (
       duration: duration,
       paymentAmount,
       isPaid,
-      paymentAtCounter: paymentAtCounter
+      paymentAtCounter: paymentAtCounter,
     });
 
     // call service function to save in database¨
     const createSuccess = await bookingServices.createBooking(newBooking);
- 
+
     //------------------start from here-----------------------------------------
     if (createSuccess) {
       const pupulatedOtherData = await createSuccess.populate([
@@ -75,7 +75,6 @@ export const createBooking = async (
         { path: 'facility' },
       ]);
       //Need to apply email is sent or not
-
       await sendBookingConfirmationEmail(pupulatedOtherData);
     }
     res.status(200).json(createSuccess);
