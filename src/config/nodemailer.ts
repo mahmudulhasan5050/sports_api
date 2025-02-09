@@ -5,9 +5,8 @@ import {
 } from '../utils/secrets';
 
 export const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: 'mail.privateemail.com',
+  port: 465,
   auth: {
     user: emailSender,
     pass: emailPassForSender,

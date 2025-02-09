@@ -14,7 +14,7 @@ export const sendBookingConfirmationEmail = async (booking: IBooking) => {
   ) {
     throw new Error('Booking data is not fully populated.');
   }
-  console.log("booking",booking)
+
   const mailOptions = {
     from: emailSender,
     to: booking.user.email,
