@@ -18,6 +18,7 @@ import {
 } from '../utils/timeSlotHelper';
 import User, { IUser } from '../models/User';
 import { calculateTimeDifference } from '../utils/timeDifference';
+import sendMail from '../config/brevo';
 
 // get available time
 export const getAvailableTime = async (
@@ -124,7 +125,7 @@ export const getAvailableCourt = async (
         );
       });
     });
-
+//sendMail()
     res.status(200).json({ availableCourts });
   } catch (error) {
     next(new BadRequestError('Invalid Request', error));

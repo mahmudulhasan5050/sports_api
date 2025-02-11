@@ -83,6 +83,7 @@ export const googleStrategy = new GoogleStrategy.Strategy(
         return done(new Error('No email found!'));
       }
     } catch (error) {
+      
       return done(error, false);
     }
   }

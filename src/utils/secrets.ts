@@ -17,3 +17,6 @@ export const emailSender = process.env['EMAIL_USER'] as string
 export const emailPassForSender = process.env['EMAIL_PASS'] as string
 
 export const stripeSecretKey = process.env['STRIPE_SECRET_KEY'] as string
+
+export const brevoApi = process.env['BREVO_API'] as string
+export const brevoApiKey = process.env['BREVO_API_KEY'] as string
