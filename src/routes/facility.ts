@@ -9,7 +9,7 @@ import {
   getFacilityById,
 } from '../controllers/facility';
 import adminAuthMiddleware from '../middleware/adminAuthMiddleware';
-
+ 
 const router = express.Router();
 
 //get all

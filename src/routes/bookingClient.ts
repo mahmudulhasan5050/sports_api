@@ -32,6 +32,6 @@ router.post(
   '/:bookingId',
   passport.authenticate('jwt', { session: false }),
   cancelBookingByUser
-); //confusion!! Check which delete is being used
+);
 
 export default router;

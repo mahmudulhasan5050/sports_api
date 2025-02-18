@@ -27,7 +27,7 @@ router.get(
   getOpeningHourById
 );
 
-//create facility
+//create 
 router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
@@ -35,7 +35,7 @@ router.post(
   createOpeningHour
 );
 
-//update one facility
+//update one 
 router.post(
   '/:openingHourId',
   passport.authenticate('jwt', { session: false }),
@@ -43,7 +43,7 @@ router.post(
   updateOpeningHour
 );
 
-//delete facility
+//delete
 router.delete(
   '/:openingHourId',
   passport.authenticate('jwt', { session: false }),

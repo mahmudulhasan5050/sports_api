@@ -58,7 +58,7 @@ passport.use(googleStrategy);
 app.use('/api/v1/user', userRouter);
 //facility
 app.use('/api/v1/facilityunit', facilityUnitRouter);
-app.use('/api/v1/facilityunit1', facilityUnitRouter);
+
 // faciliy details
 app.use('/api/v1/facility', facilityRouter);
 //opening hour
