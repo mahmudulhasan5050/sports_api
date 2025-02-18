@@ -43,7 +43,7 @@ The **SportsLot API** is a backend system built with **Node.js, Express, and Mon
    ```
 4. **Start the server**
    ```sh
-   npm start
+   npm run dev
    ```
 
 ## API Endpoints
